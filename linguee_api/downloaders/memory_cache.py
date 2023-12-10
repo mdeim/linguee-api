@@ -10,7 +10,7 @@ class MemoryCache(IDownloader):
     keeps records in memory.
     """
 
-    def __init__(self, upstream: IDownloader, maxsize: int = 1000):
+    def __init__(self, upstream: IDownloader, maxsize: int = 1):
         self.upstream = upstream
         self.download = alru_cache(maxsize=maxsize)(self.download)  # type: ignore
 

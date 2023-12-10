@@ -115,6 +115,7 @@ def parse_audio_links(text: Optional[str]) -> List[Dict[str, str]]:
         url_part = chunks[i]
         lang = chunks[i + 1]
         url = f"https://www.linguee.com/mp3/{url_part}.mp3"
+        # url = f"https://kind-fitting-bird.ngrok-free.app/mp3/{url_part}.mp3"
         ret.append({"url": url, "lang": lang})
     return ret
 

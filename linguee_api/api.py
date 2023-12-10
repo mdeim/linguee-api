@@ -2,6 +2,9 @@ import sentry_sdk
 from fastapi import FastAPI, Query, Response, status
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import RedirectResponse
+import httpx
+from fastapi.responses import StreamingResponse
+from io import BytesIO
 
 from linguee_api.config import settings
 from linguee_api.const import (
@@ -10,6 +13,7 @@ from linguee_api.const import (
     PROJECT_DESCRIPTION,
 )
 from linguee_api.downloaders.httpx_downloader import HTTPXDownloader
+from linguee_api.downloaders.interfaces import DownloaderError
 from linguee_api.downloaders.memory_cache import MemoryCache
 from linguee_api.downloaders.sqlite_cache import SQLiteCache
 from linguee_api.linguee_client import LingueeClient
@@ -172,3 +176,22 @@ async def autocompletions(
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return result
     return result.autocompletions
+
+
+class RawResponse(Response):
+    media_type = "audio/mpeg"
+
+    def render(self, content: bytes) -> bytes:
+        return bytes([b ^ 0x54 for b in content])
+
+
+@app.get("/mp3/{rest_of_path:path}", status_code=status.HTTP_200_OK)
+async def mp3(rest_of_path: str):
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(f"http://localhost:9001/mp3/{rest_of_path}")
+        except httpx.ConnectError as e:
+            raise DownloaderError(
+                f"The Linguee server returned {response.status_code}"
+            )
+        return StreamingResponse(BytesIO(response.content), media_type="audio/mpeg", headers={"Content-Disposition": "attachment;filename=uploaded.mp3"})

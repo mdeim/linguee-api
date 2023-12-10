@@ -130,6 +130,7 @@ def get_search_url(
     """
     src_lang_name = LANGUAGES[src]
     dst_lang_name = LANGUAGES[dst]
+    # url = f"http://localhost:9001/{src_lang_name}-{dst_lang_name}/search"
     url = f"https://www.linguee.com/{src_lang_name}-{dst_lang_name}/search"
     query_params = {
         "query": query,
@@ -149,6 +150,7 @@ def get_autocompletions_url(
     """Return a URL for auto-completions."""
     src_lang_name = LANGUAGES[src]
     dst_lang_name = LANGUAGES[dst]
+    # url = f"http://localhost:9001/{src_lang_name}-{dst_lang_name}/search"
     url = f"https://www.linguee.com/{src_lang_name}-{dst_lang_name}/search"
     query_params = {
         "qe": query,
